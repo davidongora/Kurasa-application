@@ -1,0 +1,383 @@
+<div class="min-h-screen transition-colors duration-200 bg-gray-50 dark:bg-gray-900">
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Contact Manager</h1>
+      <mat-slide-toggle
+        class="theme-switch"
+        color="primary"
+        (change)="toggleTheme()"
+        class="inline-flex items-center"
+      >
+        <span class="ml-2 text-gray-700 dark:text-gray-300">Dark Mode</span>
+      </mat-slide-toggle>
+    </div>
+
+    <div class="space-y-4 mb-8">
+      <div class="relative">
+        <input
+          [(ngModel)]="searchQuery"
+          (input)="searchContacts()"
+          placeholder="Search contacts..."
+          class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
+                 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 
+                 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Import Contacts
+          </label>
+          <input
+            type="file"
+            accept=".csv"
+            (change)="importContacts($event)"
+            class="block w-full text-sm text-gray-500 dark:text-gray-400
+                   file:mr-4 file:py-2 file:px-4
+                   file:rounded-md file:border-0
+                   file:text-sm file:font-semibold
+                   file:bg-blue-50 file:text-blue-700
+                   dark:file:bg-blue-900 dark:file:text-blue-200
+                   hover:file:bg-blue-100 dark:hover:file:bg-blue-800"
+          />
+        </div>
+        
+        <button
+          (click)="exportContacts()"
+          class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                 text-white rounded-lg transition-colors duration-150"
+        >
+          <i class="fas fa-download mr-2"></i>
+          Export Contacts
+        </button>
+      </div>
+    </div>
+
+     <!-- Favorites Section -->
+   <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
+        <i class="fas fa-star text-yellow-500 mr-2"></i>
+        Favorite Contacts
+      </h2>
+      <span class="text-sm text-gray-500 dark:text-gray-400">
+        {{ favorites.length }} favorites
+      </span>
+    </div>
+    
+    <div *ngIf="favorites.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let contact of favorites" 
+           class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 
+                  border border-gray-200 dark:border-gray-600 
+                  hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center space-x-3">
+          <img
+            [src]="contact.imageUrl || '/api/placeholder/40/40'"
+            alt="Profile"
+            class="w-10 h-10 rounded-full object-cover"
+          />
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-800 dark:text-white">
+              {{ contact.firstName }} {{ contact.lastName }}
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ contact.email }}</p>
+          </div>
+          <button
+            (click)="toggleFavorite(contact)"
+            class="text-yellow-500 hover:text-yellow-600 transition-colors duration-150"
+            title="Remove from favorites"
+          >
+            <i class="fas fa-star text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <p *ngIf="!favorites.length" class="text-gray-500 dark:text-gray-400 text-center italic py-4">
+      No favorite contacts yet. Click the star icon on any contact to add them to favorites.
+    </p>
+  </div>
+
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
+        Recently viewed Contacts
+      </h2>
+      <span class="text-sm text-gray-500 dark:text-gray-400">
+        {{ recentContacts.length }} contact
+      </span>
+    </div>
+    
+    <div *ngIf="recentContacts.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let contact of recentContacts" 
+           class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 
+                  border border-gray-200 dark:border-gray-600 
+                  hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center space-x-3">
+          <img
+            [src]="contact.imageUrl || '/api/placeholder/40/40'"
+            alt="Profile"
+            class="w-10 h-10 rounded-full object-cover"
+          />
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-800 dark:text-white">
+              {{ contact.firstName }} {{ contact.lastName }}
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ contact.email }}</p>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    <p *ngIf="!recentContacts.length" class="text-gray-500 dark:text-gray-400 text-center italic py-4">
+      No Recently viewed contacts yet. Click the view icon on any contact to add them to recently.
+    </p>
+  </div>
+
+  
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <button
+        (click)="toggleView()"
+        class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-gray-600 hover:bg-gray-700 
+               text-white rounded-lg transition-colors duration-150"
+      >
+        <i class="fas" [ngClass]="isGridView ? 'fa-list' : 'fa-th'"></i>
+        <span class="ml-2">{{ isGridView ? 'List View' : 'Grid View' }}</span>
+      </button>
+      
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+        <label class="inline-flex items-center">
+          <input
+            type="checkbox"
+            [(ngModel)]="selectAll"
+            (change)="toggleSelectAll()"
+            class="rounded border-gray-300 dark:border-gray-700 
+                   text-blue-600 focus:ring-blue-500 dark:bg-gray-700"
+          />
+          <span class="ml-2 text-gray-700 dark:text-gray-300">Select All</span>
+        </label>
+      
+        <!-- <button
+        (click)="sortContactsAlphabetically()"
+        class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-red-700 
+               disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-150"
+      >
+        <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+        Sort Alphabetically
+      </button> -->
+        <button
+          (click)="bulkDelete()"
+          [disabled]="!isAnyContactSelected()"
+          class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 
+                 disabled:bg-red-400 disabled:cursor-not-allowed
+                 text-white rounded-lg transition-colors duration-150"
+        >
+          <i class="fas fa-trash-alt mr-2"></i>
+          Delete Selected
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
+        All Contacts
+      </h2>
+      
+      <span class="text-sm text-gray-500 dark:text-gray-400">
+        {{ contacts.length }} Contacts
+      </span>
+        
+    </div>
+
+
+
+    <div [ngClass]="isGridView ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'">
+      <div *ngFor="let contact of visibleContacts"
+           class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 
+                  border border-gray-200 dark:border-gray-700 
+                  hover:shadow-lg transition-all duration-200">
+        <div class="flex flex-col sm:flex-row items-start gap-4">
+          <div class="flex items-center flex-1 w-full">
+            <input
+              type="checkbox"
+              [(ngModel)]="contact.selected"
+              (change)="updateSelection(contact)"
+              class="rounded border-gray-300 dark:border-gray-700 
+                     text-blue-600 focus:ring-blue-500 dark:bg-gray-700"
+            />
+            <img
+              [src]="contact.imageUrl"
+              alt="Profile"
+              class="w-12 h-12 rounded-full object-cover mx-4"
+            />
+            <div class="min-w-0 flex-1">
+              <h3 class="font-semibold text-gray-800 dark:text-white truncate">
+                {{ contact.firstName }} {{ contact.lastName }} 
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ contact.email }}</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-start sm:justify-end">
+            <button
+              (click)="toggleFavorite(contact)"
+              class="text-gray-400 hover:text-yellow-500 transition-colors duration-150 p-2"
+              [class.text-yellow-500]="contact.isFavorite"
+              title="Toggle favorite"
+            >
+              <i class="fas fa-star"></i>
+            </button>
+            <button
+              (click)="viewContact(contact)"
+              class="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 
+                     rounded-lg transition-colors duration-150"
+              title="View Details"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+            <button
+              (click)="editContact(contact)"
+              class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 
+                     rounded-lg transition-colors duration-150"
+              title="Edit Contact"
+            >
+              <i class="fas fa-edit"></i>
+            </button>
+            <button
+              (click)="softDeleteContact(contact.id)"
+              class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 
+                     rounded-lg transition-colors duration-150"
+              title="Delete Contact"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+
+
+        
+        <div *ngIf="contactBeingEdited === contact.id" 
+             class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div class="space-y-4">
+            <input
+              [(ngModel)]="contact.firstName"
+              placeholder="First Name"
+              class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            />
+            <input
+              [(ngModel)]="contact.lastName"
+              placeholder="Last Name"
+              class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            />
+            <input
+              #emailInput="ngModel"
+              [(ngModel)]="contact.email"
+              type="email"
+              name="email"
+              placeholder="Email"
+              [email]="true"
+              required
+              class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            />
+                  <div class="mt-1 text-sm text-red-500" 
+                  *ngIf="emailInput.invalid && emailInput.dirty">
+                  <div *ngIf="emailInput.errors?.['required']">
+                  Email is required
+                  </div>
+                  <div *ngIf="emailInput.errors?.['email']">
+                  Please enter a valid email address format (e.g., user&#64;domain.com)
+                  </div>
+                  <div *ngIf="emailInput.value && !emailInput.value.includes('@')">
+                  Email must contain &#64; symbol
+                  </div>
+                  <div *ngIf="emailInput.value && !emailInput.value.includes('.')">
+                  Email must contain a domain (e.g., .com)
+                  </div>
+                  <div *ngIf="emailInput.value && emailInput.value.length < 5">
+                  Email must be at least 5 characters long
+                  </div>
+                  <!-- <div *ngIf="emailInput.value && !emailInput.value.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)">
+                  Please enter a valid email format (e.g., user&#64;domain.com)
+                  </div> -->
+                  </div>
+            <div class="flex flex-col sm:flex-row justify-end gap-2">
+              <button
+                (click)="saveContact(contact)"
+                [disabled]="!isEmailValid(contact.email)"
+                class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg 
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+              
+                <i class="fas fa-save mr-2"></i>Save
+              </button>
+              <button
+                (click)="contactBeingEdited = null"
+                class="w-full sm:w-auto px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg"
+              >
+                <i class="fas fa-times mr-2"></i>Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Details Modal -->
+        <div *ngIf="selectedContact" 
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+ <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full mx-4 overflow-hidden">
+   <div class="p-6">
+     <div class="flex justify-between items-start mb-6">
+       <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Contact Details</h2>
+       <button
+         (click)="closeDetail()"
+         class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+       >
+         <i class="fas fa-times text-gray-500 dark:text-gray-400"></i>
+       </button>
+     </div>
+     
+     <div class="flex flex-col items-center mb-6">
+       <img
+         [src]="selectedContact.imageUrl"
+         alt="Profile Image"
+         class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg"
+       />
+       <h3 class="mt-4 text-xl font-semibold text-gray-800 dark:text-white">
+         {{ selectedContact.firstName }} {{ selectedContact.lastName }}
+       </h3>
+     </div>
+     
+     <div class="space-y-4">
+       <div class="flex items-center">
+         <i class="fas fa-envelope w-6 text-gray-500 dark:text-gray-400"></i>
+         <span class="ml-3 text-gray-700 dark:text-gray-300">{{ selectedContact.email }}</span>
+       </div>
+       <div class="flex items-center">
+         <i class="fas fa-phone w-6 text-gray-500 dark:text-gray-400"></i>
+         <span class="ml-3 text-gray-700 dark:text-gray-300">{{ selectedContact.phoneNumber }}</span>
+       </div>
+       <div class="flex items-center">
+         <i class="fas fa-map-marker-alt w-6 text-gray-500 dark:text-gray-400"></i>
+         <span class="ml-3 text-gray-700 dark:text-gray-300">{{ selectedContact.address }}</span>
+       </div>
+     </div>
+   </div>
+   
+   <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
+     <button
+       (click)="closeDetail()"
+       class="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+     >
+       Close
+     </button>
+   </div>
+ </div>
+      </div>
+    </div>
+  </div>
+</div>
