@@ -57,3 +57,18 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Features
+
+1. Contact Grouping
+2. List All Contacts
+3. View a Single Contact
+4. Edit and Update a Contact
+5. Search Contacts
+6. Homepage Toggle (List or Grid)
+7. Bulk Deletion
+8. Delete a Contact
+9. Favorites
+10. Import/Export Contacts
+11. Dark Mode
+12. Recent Contacts
